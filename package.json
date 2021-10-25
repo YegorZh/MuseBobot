@@ -1,0 +1,19 @@
+{
+  "name": "muzbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YegorZh/Totallynotamuzbot.git"
+  },
+  "author": "Yegor Zhukovskiy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YegorZh/Totallynotamuzbot/issues"
+  },
+  "homepage": "https://github.com/YegorZh/Totallynotamuzbot#readme"
+}
