@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/YegorZh/Totallynotamuzbot/issues"
   },
-  "homepage": "https://github.com/YegorZh/Totallynotamuzbot#readme"
+  "homepage": "https://github.com/YegorZh/Totallynotamuzbot#readme",
+  "dependencies": {
+    "discord.js": "^13.2.0"
+  }
 }
