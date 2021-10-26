@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/YegorZh/Totallynotamuzbot#readme",
   "dependencies": {
+    "@discordjs/rest": "^0.1.0-canary.0",
     "discord.js": "^13.2.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.2"
   }
 }
