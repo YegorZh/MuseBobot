@@ -3,7 +3,7 @@ import { Command } from './deploy-commands';
 import { Client, Intents, Collection } from 'discord.js';
 const { token } = require('./botconfig.json');
 
-const client: Client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client: Client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] });
 
 let commands = new Collection();
 const commandFiles: string[] = fs.readdirSync('./commands').filter(file => file.endsWith('js'));

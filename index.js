@@ -31,7 +31,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const discord_js_1 = require("discord.js");
 const { token } = require('./botconfig.json');
-const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS] });
+const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES] });
 let commands = new discord_js_1.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('js'));
 for (const file of commandFiles) {

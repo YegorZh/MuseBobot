@@ -1,14 +1,23 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import {CommandInteraction, Interaction, InteractionType} from "discord.js";
+import {CommandInteraction, Guild, GuildMember, Interaction, InteractionType, VoiceState} from "discord.js";
+import {APIInteractionGuildMember} from 'discord-api-types';
+import {DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection} from "@discordjs/voice";
 
-// module.exports = {
-//     data: new SlashCommandBuilder()
-//         .setName('ping')
-//         .setDescription('Replies with Pong!'),
-//     async execute(interaction: CommandInteraction) {
-//         await interaction.reply('Pong!');
-//     }
-// }
-const { generateDependencyReport } = require('@discordjs/voice');
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('play')
+        .setDescription('Plays first found youtube video by keyword or link.'),
+    async execute(interaction: CommandInteraction) {
 
-console.log(generateDependencyReport());
+        const member: GuildMember | null = interaction.member as GuildMember;
+        if(member.voice.channel){
+            const connection: VoiceConnection = joinVoiceChannel({
+                channelId: member.voice.channel.id,
+                guildId: member.voice.channel.guild.id,
+                adapterCreator: member.voice.channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
+            });
+        }
+
+        await interaction.reply('Pong!');
+    }
+}
