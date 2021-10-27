@@ -77,4 +77,5 @@ fabric.properties
 test.ts
 test.js
 botconfig.json
+temp/
 node_modules/
