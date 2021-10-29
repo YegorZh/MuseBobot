@@ -3,12 +3,13 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { CommandInteraction } from "discord.js";
+import {ServerDataArr} from "./index";
 
 const { clientId, guildId, token } = require('./botconfig.json');
 
 export interface Command{
     data: SlashCommandBuilder,
-    execute: (interaction: CommandInteraction) => Promise<void>
+    execute: (interaction: CommandInteraction, data?: ServerDataArr) => Promise<void>
 };
 
 const commands: Command[] = [];

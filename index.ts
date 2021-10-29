@@ -1,7 +1,16 @@
 import * as fs from 'fs';
 import { Command } from './deploy-commands';
 import { Client, Intents, Collection } from 'discord.js';
+import {AudioPlayer} from "@discordjs/voice";
 const { token } = require('./botconfig.json');
+export interface ServerData {
+    audioPlayer: AudioPlayer;
+    songs: string[];
+}
+export type ServerDataArr = {
+    [key: string]: ServerData
+};
+const servData: ServerDataArr = {};
 
 const client: Client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] });
 
@@ -24,7 +33,7 @@ client.on('interactionCreate', async interaction => {
     if(!command) return;
 
     try{
-        await command.execute(interaction);
+        await command.execute(interaction, servData);
     } catch (error) {
         console.error(error);
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

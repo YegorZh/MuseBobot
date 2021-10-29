@@ -31,6 +31,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const discord_js_1 = require("discord.js");
 const { token } = require('./botconfig.json');
+const servData = {};
 const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES] });
 let commands = new discord_js_1.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('js'));
@@ -48,7 +49,7 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
     if (!command)
         return;
     try {
-        yield command.execute(interaction);
+        yield command.execute(interaction, servData);
     }
     catch (error) {
         console.error(error);
