@@ -8,22 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const builders_1 = require("@discordjs/builders");
 const discord_js_1 = require("discord.js");
 const voice_1 = require("@discordjs/voice");
-const ytdl_core_1 = __importDefault(require("ytdl-core"));
-function playSong(interaction, servData) {
-    const resource = (0, voice_1.createAudioResource)((0, ytdl_core_1.default)(servData.songs[0], { filter: 'audioonly', quality: 'highestaudio' }), {
-        inputType: voice_1.StreamType.WebmOpus
-    });
-    resource.playStream.on('readable', () => __awaiter(this, void 0, void 0, function* () {
-        servData.audioPlayer.play(resource);
-    }));
-}
+const guildMusData_1 = require("../guildMusData");
 module.exports = {
     data: new builders_1.SlashCommandBuilder()
         .setName('play')
@@ -47,17 +36,14 @@ module.exports = {
                 adapterCreator: channel.guild.voiceAdapterCreator,
             });
             if (!data[guildId]) {
-                data[guildId] = {
-                    audioPlayer: (0, voice_1.createAudioPlayer)(),
-                    songs: []
-                };
+                data[guildId] = new guildMusData_1.GuildMusData((0, voice_1.createAudioPlayer)());
                 data[guildId].audioPlayer.on('error', error => {
                     console.error('Error:', error.message);
                 });
                 data[guildId].audioPlayer.on(voice_1.AudioPlayerStatus.Idle, () => {
                     data[guildId].songs.shift();
                     if (data[guildId].songs.length > 0) {
-                        playSong(interaction, data[guildId]);
+                        data[guildId].playSong();
                         interaction.followUp(`Playing ${data[guildId].songs[0]}`);
                     }
                     else {
@@ -75,7 +61,7 @@ module.exports = {
                 player.unpause();
             }
             if (player.state.status === voice_1.AudioPlayerStatus.Idle) {
-                playSong(interaction, data[guildId]);
+                data[guildId].playSong();
                 yield interaction.reply(`Playing ${link}`);
             }
             else
