@@ -13,7 +13,7 @@ const builders_1 = require("@discordjs/builders");
 module.exports = {
     data: new builders_1.SlashCommandBuilder()
         .setName('ping')
-        .setDescription('Replies with Pong!'),
+        .setDescription('Replies with pong!'),
     execute(interaction) {
         return __awaiter(this, void 0, void 0, function* () {
             yield interaction.reply('Pong!');

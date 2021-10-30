@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import { Command } from './deploy-commands';
 import { Client, Intents, Collection } from 'discord.js';
+import {guildsMusDataArr} from "./guildMusData";
 const { token } = require('./botconfig.json');
 
-const client: Client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client: Client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] });
 
 let commands = new Collection();
 const commandFiles: string[] = fs.readdirSync('./commands').filter(file => file.endsWith('js'));
@@ -24,7 +25,7 @@ client.on('interactionCreate', async interaction => {
     if(!command) return;
 
     try{
-        await command.execute(interaction);
+        await command.execute(interaction, guildsMusDataArr);
     } catch (error) {
         console.error(error);
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

@@ -4,7 +4,7 @@ import {CommandInteraction, Interaction, InteractionType} from "discord.js";
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ping')
-        .setDescription('Replies with Pong!'),
+        .setDescription('Replies with pong!'),
     async execute(interaction: CommandInteraction) {
         await interaction.reply('Pong!');
     }

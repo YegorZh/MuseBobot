@@ -30,8 +30,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const discord_js_1 = require("discord.js");
+const guildMusData_1 = require("./guildMusData");
 const { token } = require('./botconfig.json');
-const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS] });
+const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES] });
 let commands = new discord_js_1.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('js'));
 for (const file of commandFiles) {
@@ -48,7 +49,7 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
     if (!command)
         return;
     try {
-        yield command.execute(interaction);
+        yield command.execute(interaction, guildMusData_1.guildsMusDataArr);
     }
     catch (error) {
         console.error(error);
