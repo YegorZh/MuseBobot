@@ -13,15 +13,21 @@ const builders_1 = require("@discordjs/builders");
 const guildMusData_1 = require("../guildMusData");
 module.exports = {
     data: new builders_1.SlashCommandBuilder()
-        .setName('skip')
-        .setDescription('Skips current track'),
+        .setName('loop')
+        .setDescription('Whether to loop the song or not'),
     execute(interaction, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const check = (0, guildMusData_1.defaultErrorCheck)(interaction, data);
+            const check = yield (0, guildMusData_1.defaultErrorCheck)(interaction, data);
             if (!check)
                 return;
-            const { guildId, connection } = check;
-            yield (0, guildMusData_1.guildSkip)(interaction, data, guildId, connection);
+            const { guildId } = check;
+            data[guildId].loop = !data[guildId].loop;
+            if (data[guildId].loop) {
+                yield interaction.reply(`Now looping`);
+            }
+            else {
+                yield interaction.reply(`Not looping anymore`);
+            }
         });
     }
 };

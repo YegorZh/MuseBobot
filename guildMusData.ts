@@ -1,12 +1,12 @@
 import {
     AudioPlayer, AudioPlayerStatus,
     AudioResource,
-    createAudioResource,
+    createAudioResource, getVoiceConnection,
     StreamType,
     VoiceConnection
 } from "@discordjs/voice";
 import ytdl from "ytdl-core";
-import {CommandInteraction} from "discord.js";
+import {CommandInteraction, GuildMember} from "discord.js";
 
 export async function guildSkip(interaction: CommandInteraction, data: GuildMusDataArr, guildId: string, connection: VoiceConnection){
     let str: string;
@@ -23,6 +23,33 @@ export async function guildSkip(interaction: CommandInteraction, data: GuildMusD
     }
 }
 
+export function defaultErrorCheck(interaction: CommandInteraction, data: GuildMusDataArr){
+    const member = interaction.member;
+    if(!(member instanceof GuildMember)) {
+        interaction.reply({ content: 'Some dumb error with missing user i dunno.', ephemeral: true });
+        return null;
+    }
+
+    const guildId = member.voice.channel?.guild.id;
+    if(!guildId) {
+        interaction.reply({ content: 'You must be in a voice channel with the bot.', ephemeral: true });
+        return null;
+    }
+
+    const connection = getVoiceConnection(guildId);
+    if(connection?.joinConfig.channelId !== member.voice.channel?.id){
+        interaction.reply({ content: 'You must be in a voice channel with the bot.', ephemeral: true });
+        return null;
+    }
+
+    if(!data[guildId] || !connection) {
+        interaction.reply({content: 'Bot isn\'t playing any songs'});
+        return null;
+    }
+
+    return {member, guildId, connection};
+}
+
 export type GuildMusDataArr = {
     [key: string]: GuildMusData
 };
@@ -31,10 +58,12 @@ export const guildsMusDataArr: GuildMusDataArr = {};
 export class GuildMusData{
     audioPlayer: AudioPlayer;
     songs: string[];
+    loop: boolean;
 
     constructor(player: AudioPlayer, link?: string) {
         this.audioPlayer = player;
         this.songs = [];
+        this.loop = false;
         if(link) this.songs.push(link);
     }
 
@@ -43,7 +72,8 @@ export class GuildMusData{
             console.error('Error:', error.message);
         });
         data[guildId].audioPlayer.on(AudioPlayerStatus.Idle, () => {
-            guildSkip(interaction, data, guildId, connection);
+            this.loop ? this.playSong() :
+                guildSkip(interaction, data, guildId, connection);
         });
     }
 
