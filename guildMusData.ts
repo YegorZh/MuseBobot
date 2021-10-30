@@ -1,13 +1,27 @@
 import {
     AudioPlayer, AudioPlayerStatus,
     AudioResource,
-    createAudioPlayer,
     createAudioResource,
     StreamType,
     VoiceConnection
 } from "@discordjs/voice";
 import ytdl from "ytdl-core";
 import {CommandInteraction} from "discord.js";
+
+export async function guildSkip(interaction: CommandInteraction, data: GuildMusDataArr, guildId: string, connection: VoiceConnection){
+    let str: string;
+    if(data[guildId].skip(data, guildId, connection)){
+        str = `Playing ${data[guildId].songs[0]}`;
+
+        if(interaction.replied) return await interaction.followUp(str);
+        return await interaction.reply(str);
+    } else {
+        str = 'Finished playing';
+
+        if(interaction.replied) return await interaction.followUp(str);
+        return await interaction.reply(str);
+    }
+}
 
 export type GuildMusDataArr = {
     [key: string]: GuildMusData
@@ -29,11 +43,7 @@ export class GuildMusData{
             console.error('Error:', error.message);
         });
         data[guildId].audioPlayer.on(AudioPlayerStatus.Idle, () => {
-            if(data[guildId].skip(data, guildId, connection)){
-                interaction.followUp(`Playing ${data[guildId].songs[0]}`);
-            } else {
-                interaction.followUp('Finished playing');
-            }
+            guildSkip(interaction, data, guildId, connection);
         });
     }
 
