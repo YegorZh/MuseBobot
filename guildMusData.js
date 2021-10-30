@@ -12,9 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GuildMusData = exports.guildsMusDataArr = void 0;
+exports.GuildMusData = exports.guildsMusDataArr = exports.guildSkip = void 0;
 const voice_1 = require("@discordjs/voice");
 const ytdl_core_1 = __importDefault(require("ytdl-core"));
+function guildSkip(interaction, data, guildId, connection) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let str;
+        if (data[guildId].skip(data, guildId, connection)) {
+            str = `Playing ${data[guildId].songs[0]}`;
+            if (interaction.replied)
+                return yield interaction.followUp(str);
+            return yield interaction.reply(str);
+        }
+        else {
+            str = 'Finished playing';
+            if (interaction.replied)
+                return yield interaction.followUp(str);
+            return yield interaction.reply(str);
+        }
+    });
+}
+exports.guildSkip = guildSkip;
 exports.guildsMusDataArr = {};
 class GuildMusData {
     constructor(player, link) {
@@ -28,12 +46,7 @@ class GuildMusData {
             console.error('Error:', error.message);
         });
         data[guildId].audioPlayer.on(voice_1.AudioPlayerStatus.Idle, () => {
-            if (data[guildId].skip(data, guildId, connection)) {
-                interaction.followUp(`Playing ${data[guildId].songs[0]}`);
-            }
-            else {
-                interaction.followUp('Finished playing');
-            }
+            guildSkip(interaction, data, guildId, connection);
         });
     }
     playSong() {

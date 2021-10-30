@@ -2,12 +2,9 @@ import {SlashCommandBuilder} from '@discordjs/builders'
 import {CommandInteraction, GuildMember} from "discord.js";
 import {
     AudioPlayerStatus,
-    AudioResource,
     createAudioPlayer,
-    createAudioResource,
     DiscordGatewayAdapterCreator,
     joinVoiceChannel,
-    StreamType,
     VoiceConnection
 } from "@discordjs/voice";
 import {GuildMusData, GuildMusDataArr} from "../guildMusData";
@@ -28,7 +25,7 @@ module.exports = {
         if(!channel) return await interaction.reply({ content: 'You must be in a voice channel.', ephemeral: true });
 
         const link = interaction.options.getString('link');
-        if(typeof link !== "string") return interaction.reply({ content: 'You must enter a link or a keyword.', ephemeral: true });
+        if(typeof link !== "string") return interaction.reply({ content: 'You must enter a link.', ephemeral: true });
 
         const guildId = channel.guild.id;
         const connection: VoiceConnection = joinVoiceChannel({
