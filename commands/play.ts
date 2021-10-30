@@ -24,8 +24,11 @@ module.exports = {
         const channel = member.voice.channel;
         if(!channel) return await interaction.reply({ content: 'You must be in a voice channel.', ephemeral: true });
 
+
         const link = interaction.options.getString('link');
-        if(typeof link !== "string") return interaction.reply({ content: 'You must enter a link.', ephemeral: true });
+        if(typeof link !== "string" || link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1
+        ) return interaction.reply({ content: 'You must enter a youtube video link.', ephemeral: true });
+
 
         const guildId = channel.guild.id;
         const connection: VoiceConnection = joinVoiceChannel({
