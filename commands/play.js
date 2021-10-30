@@ -37,22 +37,7 @@ module.exports = {
             });
             if (!data[guildId]) {
                 data[guildId] = new guildMusData_1.GuildMusData((0, voice_1.createAudioPlayer)());
-                data[guildId].audioPlayer.on('error', error => {
-                    console.error('Error:', error.message);
-                });
-                data[guildId].audioPlayer.on(voice_1.AudioPlayerStatus.Idle, () => {
-                    data[guildId].songs.shift();
-                    if (data[guildId].songs.length > 0) {
-                        data[guildId].playSong();
-                        interaction.followUp(`Playing ${data[guildId].songs[0]}`);
-                    }
-                    else {
-                        interaction.followUp('Finished playing');
-                        data[guildId].audioPlayer.stop();
-                        delete data[guildId];
-                        connection.destroy();
-                    }
-                });
+                data[guildId].initialise(data, guildId, interaction, connection);
             }
             let player = data[guildId].audioPlayer;
             connection.subscribe(player);
