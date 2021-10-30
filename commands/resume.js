@@ -22,6 +22,7 @@ module.exports = {
                 return;
             const { guildId } = check;
             data[guildId].audioPlayer.unpause();
+            yield interaction.reply('Song\'s unpaused');
         });
     }
 };
