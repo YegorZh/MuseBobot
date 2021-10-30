@@ -12,10 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const builders_1 = require("@discordjs/builders");
 module.exports = {
     data: new builders_1.SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Replies with pong!'),
-    execute(interaction) {
+        .setName('help')
+        .setDescription('Lists all commands and their descriptions'),
+    execute(interaction, data) {
         return __awaiter(this, void 0, void 0, function* () {
+            const str = 'Play - plays the song from the link or adds it to the playlist if already playing.\n' +
+                'Skip - skips current song.\n' +
+                'Loop - loops or stops looping current song.\n' +
+                'Pause - pauses playing.\n' +
+                'Resume - resumes playing.\n' +
+                'Stop - makes bot to completely stop playing and exit the voice channel.';
+            yield interaction.reply({ content: str, ephemeral: true });
         });
     }
 };
