@@ -37,16 +37,12 @@ module.exports = {
             }
             let player = data[guildId].audioPlayer;
             connection.subscribe(player);
-            data[guildId].songs.push(link);
+            data[guildId].songs[0] = link;
             if (player.state.status === voice_1.AudioPlayerStatus.Paused) {
                 player.unpause();
             }
-            if (player.state.status === voice_1.AudioPlayerStatus.Idle) {
-                data[guildId].playSong();
-                yield interaction.reply(`Playing ${link}`);
-            }
-            else
-                yield interaction.reply(`Song ${link} added to playlist`);
+            data[guildId].playSong();
+            yield interaction.reply(`Playing ${link}`);
         });
     }
 };
