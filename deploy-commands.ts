@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from '@discordjs/rest';
 import { CommandInteraction } from "discord.js";
 import {GuildMusDataArr} from "./guildMusData";
-import {Routes} from "discord-api-types";
+import {Routes} from "discord-api-types/v9";
 
 const { clientId, guildId, token } = require('./botconfig.json');
 

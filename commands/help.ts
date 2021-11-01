@@ -8,7 +8,8 @@ module.exports = {
         .setDescription('Lists all commands and their descriptions'),
     async execute(interaction: CommandInteraction, data: GuildMusDataArr) {
         const str =
-            'Play - plays the song from the link or adds it to the playlist if already playing.\n' +
+            'Play - plays the song from the link replacing current playing track.\n' +
+            'Add - adds song to the playlist.\n'+
             'Skip - skips current song.\n' +
             'Loop - loops or stops looping current song.\n' +
             'Pause - pauses playing.\n' +

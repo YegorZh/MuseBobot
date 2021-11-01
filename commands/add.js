@@ -10,20 +10,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const builders_1 = require("@discordjs/builders");
+const guildMusData_1 = require("../guildMusData");
 module.exports = {
     data: new builders_1.SlashCommandBuilder()
-        .setName('help')
-        .setDescription('Lists all commands and their descriptions'),
+        .setName('add')
+        .setDescription('Adds song to the playlist')
+        .addStringOption(option => option.setName('link').setDescription('Link duh').setRequired(true)),
     execute(interaction, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const str = 'Play - plays the song from the link replacing current playing track.\n' +
-                'Add - adds song to the playlist.\n' +
-                'Skip - skips current song.\n' +
-                'Loop - loops or stops looping current song.\n' +
-                'Pause - pauses playing.\n' +
-                'Resume - resumes playing.\n' +
-                'Stop - makes bot to completely stop playing and exit the voice channel.';
-            yield interaction.reply({ content: str, ephemeral: true });
+            const check = (0, guildMusData_1.defaultErrorCheck)(interaction, data);
+            if (!check)
+                return;
+            const { guildId } = check;
+            const link = interaction.options.getString('link');
+            if (typeof link !== "string" || link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1)
+                return interaction.reply({ content: 'You must enter a youtube video link.', ephemeral: true });
+            data[guildId].songs.push(link);
+            yield interaction.reply(`Song ${link} was added to playlist`);
         });
     }
 };
