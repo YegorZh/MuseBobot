@@ -11,8 +11,9 @@ module.exports = {
         .setDescription('Skips current track'),
     async execute(interaction: CommandInteraction, data: GuildMusDataArr) {
         const check = defaultErrorCheck(interaction, data);
-        if(!check) return;
+        if(!check || !check.connection) return;
         const {guildId, connection} = check;
+
         await guildSkip(interaction, data, guildId, connection);
     }
 }

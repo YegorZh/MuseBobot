@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
 import { CommandInteraction } from "discord.js";
 import {GuildMusDataArr} from "./guildMusData";
+import {Routes} from "discord-api-types";
 
 const { clientId, guildId, token } = require('./botconfig.json');
 
