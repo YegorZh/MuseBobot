@@ -14,48 +14,56 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GuildMusData = exports.guildsMusDataArr = exports.defaultErrorCheck = exports.guildSkip = void 0;
 const voice_1 = require("@discordjs/voice");
-const ytdl_core_1 = __importDefault(require("ytdl-core"));
+const youtubedl = require('youtube-dl-exec');
 const discord_js_1 = require("discord.js");
+const got_1 = __importDefault(require("got"));
 function guildSkip(interaction, data, guildId, connection) {
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         let str;
         if (data[guildId].skip(data, guildId, connection)) {
             str = `Playing ${data[guildId].songs[0]}`;
             if (interaction.replied)
-                return yield interaction.followUp(str);
+                return yield ((_a = interaction.channel) === null || _a === void 0 ? void 0 : _a.send(str));
             return yield interaction.reply(str);
         }
         else {
             str = 'Finished playing';
             if (interaction.replied)
-                return yield interaction.followUp(str);
+                return yield ((_b = interaction.channel) === null || _b === void 0 ? void 0 : _b.send(str));
             return yield interaction.reply(str);
         }
     });
 }
 exports.guildSkip = guildSkip;
-function defaultErrorCheck(interaction, data) {
-    var _a, _b;
+function defaultErrorCheck(interaction, data, short = false) {
+    var _a, _b, _c, _d, _e;
+    function reply(str) {
+        interaction.reply({ content: str, ephemeral: true });
+        return null;
+    }
+    const textChannel = interaction.channel;
+    if (!textChannel)
+        return reply('Some dumb error with text channel, try another one');
+    if (!((_b = (_a = interaction.guild) === null || _a === void 0 ? void 0 : _a.me) === null || _b === void 0 ? void 0 : _b.permissionsIn(textChannel).has(["SEND_MESSAGES", "VIEW_CHANNEL"])))
+        return reply('Bot has no permissions in this text channel.');
     const member = interaction.member;
-    if (!(member instanceof discord_js_1.GuildMember)) {
-        interaction.reply({ content: 'Some dumb error with missing user i dunno.', ephemeral: true });
-        return null;
-    }
-    const guildId = (_a = member.voice.channel) === null || _a === void 0 ? void 0 : _a.guild.id;
-    if (!guildId) {
-        interaction.reply({ content: 'You must be in a voice channel with the bot.', ephemeral: true });
-        return null;
-    }
+    if (!(member instanceof discord_js_1.GuildMember))
+        return reply('Some dumb error with missing user i dunno.');
+    const voiceChannel = member.voice.channel;
+    if (!voiceChannel)
+        return reply('You must be in a voice channel with the bot.');
+    if (!((_d = (_c = interaction.guild) === null || _c === void 0 ? void 0 : _c.me) === null || _d === void 0 ? void 0 : _d.permissionsIn(voiceChannel)).has(["SPEAK", "CONNECT"]))
+        return reply('Bot has no permissions in your voice channel');
+    const guildId = voiceChannel.guildId;
+    if (short)
+        return { guildId, voiceChannel };
     const connection = (0, voice_1.getVoiceConnection)(guildId);
-    if ((connection === null || connection === void 0 ? void 0 : connection.joinConfig.channelId) !== ((_b = member.voice.channel) === null || _b === void 0 ? void 0 : _b.id)) {
-        interaction.reply({ content: 'You must be in a voice channel with the bot.', ephemeral: true });
-        return null;
-    }
-    if (!data[guildId] || !connection) {
-        interaction.reply({ content: 'Bot isn\'t playing any songs' });
-        return null;
-    }
-    return { member, guildId, connection };
+    if ((connection === null || connection === void 0 ? void 0 : connection.joinConfig.channelId) !== ((_e = member.voice.channel) === null || _e === void 0 ? void 0 : _e.id))
+        return reply('You must be in a voice channel with the bot.');
+    if (!data[guildId] || !connection)
+        return reply('You must be in a voice channel with the bot.');
+    return { member, guildId, connection, voiceChannel };
 }
 exports.defaultErrorCheck = defaultErrorCheck;
 exports.guildsMusDataArr = {};
@@ -77,12 +85,14 @@ class GuildMusData {
         });
     }
     playSong() {
-        const resource = (0, voice_1.createAudioResource)((0, ytdl_core_1.default)(this.songs[0], { filter: 'audioonly', quality: 'highestaudio' }), {
-            inputType: voice_1.StreamType.WebmOpus
+        youtubedl(this.songs[0], { f: '249', dumpJson: true }).then((output) => {
+            const resource = (0, voice_1.createAudioResource)(got_1.default.stream(output.url), {
+                inputType: voice_1.StreamType.WebmOpus
+            });
+            resource.playStream.on('readable', () => __awaiter(this, void 0, void 0, function* () {
+                this.audioPlayer.play(resource);
+            }));
         });
-        resource.playStream.on('readable', () => __awaiter(this, void 0, void 0, function* () {
-            this.audioPlayer.play(resource);
-        }));
     }
     skip(data, guildId, connection) {
         this.songs.shift();

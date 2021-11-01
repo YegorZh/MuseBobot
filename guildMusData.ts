@@ -1,53 +1,59 @@
 import {
     AudioPlayer, AudioPlayerStatus,
     AudioResource,
-    createAudioResource, getVoiceConnection,
+    createAudioResource, demuxProbe, getVoiceConnection,
     StreamType,
     VoiceConnection
 } from "@discordjs/voice";
-import ytdl from "ytdl-core";
-import {CommandInteraction, GuildMember} from "discord.js";
 
-export async function guildSkip(interaction: CommandInteraction, data: GuildMusDataArr, guildId: string, connection: VoiceConnection){
+const youtubedl = require('youtube-dl-exec')
+import {CommandInteraction, GuildChannel, GuildMember} from "discord.js";
+import got from "got";
+import * as http from "http";
+
+export async function guildSkip(interaction: CommandInteraction, data: GuildMusDataArr, guildId: string, connection: VoiceConnection) {
     let str: string;
-    if(data[guildId].skip(data, guildId, connection)){
+    if (data[guildId].skip(data, guildId, connection)) {
         str = `Playing ${data[guildId].songs[0]}`;
-
-        if(interaction.replied) return await interaction.followUp(str);
+        if (interaction.replied) return await interaction.channel?.send(str);
         return await interaction.reply(str);
     } else {
         str = 'Finished playing';
 
-        if(interaction.replied) return await interaction.followUp(str);
+        if (interaction.replied) return await interaction.channel?.send(str);
         return await interaction.reply(str);
     }
 }
 
-export function defaultErrorCheck(interaction: CommandInteraction, data: GuildMusDataArr){
-    const member = interaction.member;
-    if(!(member instanceof GuildMember)) {
-        interaction.reply({ content: 'Some dumb error with missing user i dunno.', ephemeral: true });
+export function defaultErrorCheck(interaction: CommandInteraction, data: GuildMusDataArr, short: boolean = false) {
+    function reply(str: string) {
+        interaction.reply({content: str, ephemeral: true});
         return null;
     }
 
-    const guildId = member.voice.channel?.guild.id;
-    if(!guildId) {
-        interaction.reply({ content: 'You must be in a voice channel with the bot.', ephemeral: true });
-        return null;
-    }
+    const textChannel = interaction.channel;
+    if(!textChannel) return reply('Some dumb error with text channel, try another one');
+
+    if (!(interaction.guild?.me?.permissionsIn(textChannel as GuildChannel).has(["SEND_MESSAGES", "VIEW_CHANNEL"])))
+        return reply('Bot has no permissions in this text channel.');
+
+    const member = interaction.member;
+    if (!(member instanceof GuildMember)) return reply('Some dumb error with missing user i dunno.');
+
+    const voiceChannel = member.voice.channel;
+    if (!voiceChannel) return reply('You must be in a voice channel with the bot.');
+
+    if(!(interaction.guild?.me?.permissionsIn(voiceChannel as GuildChannel)).has(["SPEAK", "CONNECT"]))
+        return reply('Bot has no permissions in your voice channel');
+
+    const guildId = voiceChannel.guildId;
+    if(short) return {guildId, voiceChannel};
 
     const connection = getVoiceConnection(guildId);
-    if(connection?.joinConfig.channelId !== member.voice.channel?.id){
-        interaction.reply({ content: 'You must be in a voice channel with the bot.', ephemeral: true });
-        return null;
-    }
+    if (connection?.joinConfig.channelId !== member.voice.channel?.id) return reply('You must be in a voice channel with the bot.');
+    if (!data[guildId] || !connection) return reply('You must be in a voice channel with the bot.');
 
-    if(!data[guildId] || !connection) {
-        interaction.reply({content: 'Bot isn\'t playing any songs'});
-        return null;
-    }
-
-    return {member, guildId, connection};
+    return {member, guildId, connection, voiceChannel};
 }
 
 export type GuildMusDataArr = {
@@ -55,7 +61,7 @@ export type GuildMusDataArr = {
 };
 export const guildsMusDataArr: GuildMusDataArr = {};
 
-export class GuildMusData{
+export class GuildMusData {
     audioPlayer: AudioPlayer;
     songs: string[];
     loop: boolean;
@@ -64,7 +70,7 @@ export class GuildMusData{
         this.audioPlayer = player;
         this.songs = [];
         this.loop = false;
-        if(link) this.songs.push(link);
+        if (link) this.songs.push(link);
     }
 
     initialise(data: GuildMusDataArr, guildId: string, interaction: CommandInteraction, connection: VoiceConnection) {
@@ -77,29 +83,30 @@ export class GuildMusData{
         });
     }
 
-    playSong(){
-        const resource: AudioResource = createAudioResource(ytdl(this.songs[0], { filter: 'audioonly', quality: 'highestaudio'}), {
-            inputType: StreamType.WebmOpus
-        });
-
-        resource.playStream.on('readable', async () =>{
-            this.audioPlayer.play(resource);
-        })
+    playSong() {
+        youtubedl(this.songs[0], {f: '249', dumpJson: true}).then((output: any) => {
+                const resource: AudioResource = createAudioResource(got.stream(output.url), {
+                    inputType: StreamType.WebmOpus
+                });
+                resource.playStream.on('readable', async () => {
+                    this.audioPlayer.play(resource);
+                })
+            }
+        );
     }
 
-    skip(data: GuildMusDataArr, guildId: string, connection: VoiceConnection): boolean{
+    skip(data: GuildMusDataArr, guildId: string, connection: VoiceConnection): boolean {
         this.songs.shift();
-        if(this.songs.length > 0){
+        if (this.songs.length > 0) {
             this.playSong();
             return true;
-        }
-        else {
+        } else {
             this.destroy(data, guildId, connection)
             return false;
         }
     }
 
-    destroy(data: GuildMusDataArr, guildId: string, connection: VoiceConnection){
+    destroy(data: GuildMusDataArr, guildId: string, connection: VoiceConnection) {
         this.audioPlayer.stop();
         delete data[guildId];
         connection.destroy();

@@ -18,7 +18,7 @@ module.exports = {
     execute(interaction, data) {
         return __awaiter(this, void 0, void 0, function* () {
             const check = (0, guildMusData_1.defaultErrorCheck)(interaction, data);
-            if (!check)
+            if (!check || !check.connection)
                 return;
             const { guildId, connection } = check;
             data[guildId].destroy(data, guildId, connection);

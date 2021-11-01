@@ -8,8 +8,9 @@ module.exports = {
         .setDescription('Completely stops the bot and exits the voice channel'),
     async execute(interaction: CommandInteraction, data: GuildMusDataArr) {
         const check = defaultErrorCheck(interaction, data);
-        if(!check) return;
+        if(!check || !check.connection) return;
         const {guildId, connection} = check;
+
         data[guildId].destroy(data, guildId, connection);
         await interaction.reply('Stopped playing');
     }

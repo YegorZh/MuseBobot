@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const builders_1 = require("@discordjs/builders");
-const discord_js_1 = require("discord.js");
 const voice_1 = require("@discordjs/voice");
 const guildMusData_1 = require("../guildMusData");
 module.exports = {
@@ -20,16 +19,13 @@ module.exports = {
         .addStringOption(option => option.setName('link').setDescription('Link duh').setRequired(true)),
     execute(interaction, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const member = interaction.member;
-            if (!(member instanceof discord_js_1.GuildMember))
-                return yield interaction.reply({ content: 'Some dumb error with member type', ephemeral: true });
-            const channel = member.voice.channel;
-            if (!channel)
-                return yield interaction.reply({ content: 'You must be in a voice channel.', ephemeral: true });
+            const check = (0, guildMusData_1.defaultErrorCheck)(interaction, data, true);
+            if (!check)
+                return;
+            const { guildId, voiceChannel: channel } = check;
             const link = interaction.options.getString('link');
             if (typeof link !== "string" || link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1)
                 return interaction.reply({ content: 'You must enter a youtube video link.', ephemeral: true });
-            const guildId = channel.guild.id;
             const connection = (0, voice_1.joinVoiceChannel)({
                 channelId: channel.id,
                 guildId: guildId,

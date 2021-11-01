@@ -21,7 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const rest_1 = require("@discordjs/rest");
-const v9_1 = require("discord-api-types/v9");
+const discord_api_types_1 = require("discord-api-types");
 const { clientId, guildId, token } = require('./botconfig.json');
 ;
 const commands = [];
@@ -31,6 +31,6 @@ for (const file of commandFiles) {
     commands.push(command.data.toJSON());
 }
 const rest = new rest_1.REST({ version: '9' }).setToken(token);
-rest.put(v9_1.Routes.applicationGuildCommands(clientId, guildId), { body: commands })
+rest.put(discord_api_types_1.Routes.applicationGuildCommands(clientId, guildId), { body: commands })
     .then(() => console.log('Successfully registered application commands.'))
     .catch(console.error);
