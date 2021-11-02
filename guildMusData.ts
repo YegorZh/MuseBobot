@@ -8,8 +8,7 @@ import {
 
 const youtubedl = require('youtube-dl-exec')
 import {CommandInteraction, GuildChannel, GuildMember} from "discord.js";
-import got from "got";
-import * as http from "http";
+import * as https from "https";
 
 export async function guildSkip(interaction: CommandInteraction, data: GuildMusDataArr, guildId: string, connection: VoiceConnection) {
     let str: string;
@@ -85,11 +84,15 @@ export class GuildMusData {
 
     playSong() {
         youtubedl(this.songs[0], {f: '249', dumpJson: true}).then((output: any) => {
-                const resource: AudioResource = createAudioResource(got.stream(output.url), {
-                    inputType: StreamType.WebmOpus
-                });
-                resource.playStream.on('readable', async () => {
-                    this.audioPlayer.play(resource);
+                https.get(output.url, (response) => {
+                    if(response.statusCode === 200){
+                        const resource: AudioResource = createAudioResource(response, {
+                            inputType: StreamType.WebmOpus
+                        });
+                        resource.playStream.on('readable', async () => {
+                            this.audioPlayer.play(resource);
+                        });
+                    }
                 })
             }
         );
