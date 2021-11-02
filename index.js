@@ -43,11 +43,20 @@ client.once('ready', () => {
     console.log('Ready!');
 });
 client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     if (!interaction.isCommand())
         return;
     const command = commands.get(interaction.commandName);
     if (!command)
         return;
+    const today = new Date();
+    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const guild = ((_a = interaction.guild) === null || _a === void 0 ? void 0 : _a.name) || 'Guild';
+    const name = ((_b = interaction.member) === null || _b === void 0 ? void 0 : _b.user.username) || 'name';
+    const log = `At ${time} ${interaction.commandName} in ${guild} by ${name}`;
+    fs.writeFile('logs.txt', log, err => { if (err)
+        console.log(err); });
+    console.log(log);
     try {
         yield command.execute(interaction, guildMusData_1.guildsMusDataArr);
     }

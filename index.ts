@@ -24,6 +24,14 @@ client.on('interactionCreate', async interaction => {
     const command: Command = commands.get(interaction.commandName) as Command;
     if(!command) return;
 
+    const today = new Date();
+    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const guild: string = interaction.guild?.name || 'Guild';
+    const name: string = interaction.member?.user.username || 'name';
+    const log = `At ${time} ${interaction.commandName} in ${guild} by ${name}`;
+
+    fs.writeFile('logs.txt', log, err => {if(err) console.log(err)});
+    console.log(log);
     try{
         await command.execute(interaction, guildsMusDataArr);
     } catch (error) {
