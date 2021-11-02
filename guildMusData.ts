@@ -92,7 +92,7 @@ export class GuildMusData {
                         resource.playStream.on('readable', async () => {
                             this.audioPlayer.play(resource);
                         });
-                    }
+                    } else console.log(response.statusMessage);
                 })
             }
         );
