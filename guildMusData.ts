@@ -8,7 +8,9 @@ import {
 
 const youtubedl = require('youtube-dl-exec')
 import {CommandInteraction, GuildChannel, GuildMember} from "discord.js";
-import * as https from "https";
+import ytdl from 'ytdl-core';
+import {Track} from "./track";
+import * as stream from "stream";
 
 export async function guildSkip(interaction: CommandInteraction, data: GuildMusDataArr, guildId: string, connection: VoiceConnection) {
     let str: string;
@@ -31,7 +33,7 @@ export function defaultErrorCheck(interaction: CommandInteraction, data: GuildMu
     }
 
     const textChannel = interaction.channel;
-    if(!textChannel) return reply('Some dumb error with text channel, try another one');
+    if (!textChannel) return reply('Some dumb error with text channel, try another one');
 
     if (!(interaction.guild?.me?.permissionsIn(textChannel as GuildChannel).has(["SEND_MESSAGES", "VIEW_CHANNEL"])))
         return reply('Bot has no permissions in this text channel.');
@@ -42,11 +44,11 @@ export function defaultErrorCheck(interaction: CommandInteraction, data: GuildMu
     const voiceChannel = member.voice.channel;
     if (!voiceChannel) return reply('You must be in a voice channel with the bot.');
 
-    if(!(interaction.guild?.me?.permissionsIn(voiceChannel as GuildChannel)).has(["SPEAK", "CONNECT"]))
+    if (!(interaction.guild?.me?.permissionsIn(voiceChannel as GuildChannel)).has(["SPEAK", "CONNECT"]))
         return reply('Bot has no permissions in your voice channel');
 
     const guildId = voiceChannel.guildId;
-    if(short) return {guildId, voiceChannel};
+    if (short) return {guildId, voiceChannel};
 
     const connection = getVoiceConnection(guildId);
     if (connection?.joinConfig.channelId !== member.voice.channel?.id) return reply('You must be in a voice channel with the bot.');
@@ -83,19 +85,47 @@ export class GuildMusData {
     }
 
     playSong() {
-        youtubedl(this.songs[0], {f: '249', dumpJson: true}).then((output: any) => {
-                https.get(output.url, (response) => {
-                    if(response.statusCode === 200){
-                        const resource: AudioResource = createAudioResource(response, {
-                            inputType: StreamType.WebmOpus
-                        });
-                        resource.playStream.on('readable', async () => {
-                            this.audioPlayer.play(resource);
-                        });
-                    } else console.log(response.statusMessage);
-                })
-            }
-        );
+        Track.from(this.songs[0]).then(stream => {
+            stream.createAudioResource().then(resource => {
+                resource.playStream.on('readable', async () => {
+                    this.audioPlayer.play(resource);
+            });
+        });
+        });
+
+        // ytdl.getInfo(this.songs[0]).then((info) => {
+        //     const resource: AudioResource = createAudioResource(ytdl.downloadFromInfo(info, {highWaterMark: 1<<25, quality: 'highestaudio', filter: 'audioonly', requestOptions:
+        //             {maxReconnects: 24,
+        //             maxRetries: 12,
+        //             backoff: { inc: 500, max: 10000 }}}), {
+        //         inputType: StreamType.WebmOpus
+        //     });
+        //     resource.playStream.on('readable', async () => {
+        //         this.audioPlayer.play(resource);
+        //     });
+        // });
+
+
+        // youtubedl(this.songs[0], {f: '249', dumpJson: true}).then((output: any) => {
+        //         const req = https.get(output.url,  (response) => {
+        //             if (response.statusCode === 200) {
+        //                 const resource: AudioResource = createAudioResource(response, {
+        //                     inputType: StreamType.WebmOpus
+        //                 });
+        //                 resource.playStream.on('readable', async () => {
+        //                     this.audioPlayer.play(resource);
+        //                 });
+        //             }
+        //         })
+        //         req.on('error', function (e) {
+        //             console.log(e);
+        //         });
+        //         req.on('timeout', function () {
+        //             console.log('timeout');
+        //             req.destroy();
+        //         });
+        //     }
+        // );
     }
 
     skip(data: GuildMusDataArr, guildId: string, connection: VoiceConnection): boolean {

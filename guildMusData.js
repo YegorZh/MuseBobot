@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -32,7 +13,7 @@ exports.GuildMusData = exports.guildsMusDataArr = exports.defaultErrorCheck = ex
 const voice_1 = require("@discordjs/voice");
 const youtubedl = require('youtube-dl-exec');
 const discord_js_1 = require("discord.js");
-const https = __importStar(require("https"));
+const track_1 = require("./track");
 function guildSkip(interaction, data, guildId, connection) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
@@ -101,18 +82,44 @@ class GuildMusData {
         });
     }
     playSong() {
-        youtubedl(this.songs[0], { f: '249', dumpJson: true }).then((output) => {
-            https.get(output.url, (response) => {
-                if (response.statusCode === 200) {
-                    const resource = (0, voice_1.createAudioResource)(response, {
-                        inputType: voice_1.StreamType.WebmOpus
-                    });
-                    resource.playStream.on('readable', () => __awaiter(this, void 0, void 0, function* () {
-                        this.audioPlayer.play(resource);
-                    }));
-                }
+        track_1.Track.from(this.songs[0]).then(stream => {
+            stream.createAudioResource().then(resource => {
+                resource.playStream.on('readable', () => __awaiter(this, void 0, void 0, function* () {
+                    this.audioPlayer.play(resource);
+                }));
             });
         });
+        // ytdl.getInfo(this.songs[0]).then((info) => {
+        //     const resource: AudioResource = createAudioResource(ytdl.downloadFromInfo(info, {highWaterMark: 1<<25, quality: 'highestaudio', filter: 'audioonly', requestOptions:
+        //             {maxReconnects: 24,
+        //             maxRetries: 12,
+        //             backoff: { inc: 500, max: 10000 }}}), {
+        //         inputType: StreamType.WebmOpus
+        //     });
+        //     resource.playStream.on('readable', async () => {
+        //         this.audioPlayer.play(resource);
+        //     });
+        // });
+        // youtubedl(this.songs[0], {f: '249', dumpJson: true}).then((output: any) => {
+        //         const req = https.get(output.url,  (response) => {
+        //             if (response.statusCode === 200) {
+        //                 const resource: AudioResource = createAudioResource(response, {
+        //                     inputType: StreamType.WebmOpus
+        //                 });
+        //                 resource.playStream.on('readable', async () => {
+        //                     this.audioPlayer.play(resource);
+        //                 });
+        //             }
+        //         })
+        //         req.on('error', function (e) {
+        //             console.log(e);
+        //         });
+        //         req.on('timeout', function () {
+        //             console.log('timeout');
+        //             req.destroy();
+        //         });
+        //     }
+        // );
     }
     skip(data, guildId, connection) {
         this.songs.shift();
