@@ -31,7 +31,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const discord_js_1 = require("discord.js");
 const guildMusData_1 = require("./guildMusData");
-const { token } = require('./botconfig.json');
+// const { token } = require('./botconfig.json');
 const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES] });
 let commands = new discord_js_1.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('js'));
@@ -54,8 +54,7 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
     const guild = ((_a = interaction.guild) === null || _a === void 0 ? void 0 : _a.name) || 'Guild';
     const name = ((_b = interaction.member) === null || _b === void 0 ? void 0 : _b.user.username) || 'name';
     const log = `At ${time} ${interaction.commandName} in ${guild} by ${name}`;
-    fs.writeFile('logs.txt', log, err => { if (err)
-        console.log(err); });
+    // fs.writeFile('logs.txt', log, err => {if(err) console.log(err)});
     console.log(log);
     try {
         yield command.execute(interaction, guildMusData_1.guildsMusDataArr);
@@ -65,4 +64,4 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
         yield interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 }));
-client.login(token);
+client.login(process.env.TOKEN);

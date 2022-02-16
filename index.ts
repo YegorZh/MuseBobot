@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Command } from './deploy-commands';
 import { Client, Intents, Collection } from 'discord.js';
 import {guildsMusDataArr} from "./guildMusData";
-const { token } = require('./botconfig.json');
+// const { token } = require('./botconfig.json');
 
 const client: Client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] });
 
