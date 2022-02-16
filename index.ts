@@ -30,7 +30,7 @@ client.on('interactionCreate', async interaction => {
     const name: string = interaction.member?.user.username || 'name';
     const log = `At ${time} ${interaction.commandName} in ${guild} by ${name}`;
 
-    fs.writeFile('logs.txt', log, err => {if(err) console.log(err)});
+    // fs.writeFile('logs.txt', log, err => {if(err) console.log(err)});
     console.log(log);
     try{
         await command.execute(interaction, guildsMusDataArr);
