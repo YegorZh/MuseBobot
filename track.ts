@@ -1,3 +1,6 @@
+//My efforts to implement streaming from youtube had too many bugs in them so in the end i took someones code from discord.js github and it actually
+//works several times better than all of my attempts
+
 import { getInfo } from 'ytdl-core';
 import { AudioResource, createAudioResource, demuxProbe } from '@discordjs/voice';
 import { raw as ytdl } from 'youtube-dl-exec';
