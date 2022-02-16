@@ -74,6 +74,7 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # Private files and junk
+logs.txt
 test.ts
 test.js
 botconfig.json

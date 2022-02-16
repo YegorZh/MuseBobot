@@ -8,15 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GuildMusData = exports.guildsMusDataArr = exports.defaultErrorCheck = exports.guildSkip = void 0;
 const voice_1 = require("@discordjs/voice");
 const youtubedl = require('youtube-dl-exec');
 const discord_js_1 = require("discord.js");
-const got_1 = __importDefault(require("got"));
+const track_1 = require("./track");
 function guildSkip(interaction, data, guildId, connection) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
@@ -85,14 +82,44 @@ class GuildMusData {
         });
     }
     playSong() {
-        youtubedl(this.songs[0], { f: '249', dumpJson: true }).then((output) => {
-            const resource = (0, voice_1.createAudioResource)(got_1.default.stream(output.url), {
-                inputType: voice_1.StreamType.WebmOpus
+        track_1.Track.from(this.songs[0]).then(stream => {
+            stream.createAudioResource().then(resource => {
+                resource.playStream.on('readable', () => __awaiter(this, void 0, void 0, function* () {
+                    this.audioPlayer.play(resource);
+                }));
             });
-            resource.playStream.on('readable', () => __awaiter(this, void 0, void 0, function* () {
-                this.audioPlayer.play(resource);
-            }));
         });
+        // ytdl.getInfo(this.songs[0]).then((info) => {
+        //     const resource: AudioResource = createAudioResource(ytdl.downloadFromInfo(info, {highWaterMark: 1<<25, quality: 'highestaudio', filter: 'audioonly', requestOptions:
+        //             {maxReconnects: 24,
+        //             maxRetries: 12,
+        //             backoff: { inc: 500, max: 10000 }}}), {
+        //         inputType: StreamType.WebmOpus
+        //     });
+        //     resource.playStream.on('readable', async () => {
+        //         this.audioPlayer.play(resource);
+        //     });
+        // });
+        // youtubedl(this.songs[0], {f: '249', dumpJson: true}).then((output: any) => {
+        //         const req = https.get(output.url,  (response) => {
+        //             if (response.statusCode === 200) {
+        //                 const resource: AudioResource = createAudioResource(response, {
+        //                     inputType: StreamType.WebmOpus
+        //                 });
+        //                 resource.playStream.on('readable', async () => {
+        //                     this.audioPlayer.play(resource);
+        //                 });
+        //             }
+        //         })
+        //         req.on('error', function (e) {
+        //             console.log(e);
+        //         });
+        //         req.on('timeout', function () {
+        //             console.log('timeout');
+        //             req.destroy();
+        //         });
+        //     }
+        // );
     }
     skip(data, guildId, connection) {
         this.songs.shift();
