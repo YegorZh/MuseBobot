@@ -7,18 +7,18 @@ import {getVoiceConnection} from "@discordjs/voice";
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('loop')
-        .setDescription('Whether to loop the song or not'),
+        .setName('loopqueue')
+        .setDescription('Whether to loop the playlist or not'),
     async execute(interaction: CommandInteraction, data: GuildMusDataArr) {
         const check = await defaultErrorCheck(interaction, data);
         if(!check) return;
         const {guildId} = check;
 
-        data[guildId].loop = !data[guildId].loop;
-        if(data[guildId].loop){
-            await interaction.reply(`Now looping song`);
+        data[guildId].loopQueue = !data[guildId].loopQueue;
+        if(data[guildId].loopQueue){
+            await interaction.reply(`Now looping playlist`);
         } else {
-            await interaction.reply(`Not looping song anymore`);
+            await interaction.reply(`Not looping playlist anymore`);
         }
     }
 }

@@ -69,6 +69,7 @@ class GuildMusData {
         this.audioPlayer = player;
         this.songs = [];
         this.loop = false;
+        this.loopQueue = false;
         if (link)
             this.songs.push(link);
     }
@@ -122,7 +123,12 @@ class GuildMusData {
         // );
     }
     skip(data, guildId, connection) {
-        this.songs.shift();
+        if (this.loopQueue) {
+            this.songs[this.songs.length - 1] = this.songs.shift();
+        }
+        else {
+            this.songs.shift();
+        }
         if (this.songs.length > 0) {
             this.playSong();
             return true;

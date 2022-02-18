@@ -13,20 +13,20 @@ const builders_1 = require("@discordjs/builders");
 const guildMusData_1 = require("../guildMusData");
 module.exports = {
     data: new builders_1.SlashCommandBuilder()
-        .setName('loop')
-        .setDescription('Whether to loop the song or not'),
+        .setName('loopqueue')
+        .setDescription('Whether to loop the queue or not'),
     execute(interaction, data) {
         return __awaiter(this, void 0, void 0, function* () {
             const check = yield (0, guildMusData_1.defaultErrorCheck)(interaction, data);
             if (!check)
                 return;
             const { guildId } = check;
-            data[guildId].loop = !data[guildId].loop;
-            if (data[guildId].loop) {
-                yield interaction.reply(`Now looping song`);
+            data[guildId].loopQueue = !data[guildId].loopQueue;
+            if (data[guildId].loopQueue) {
+                yield interaction.reply(`Now looping queue`);
             }
             else {
-                yield interaction.reply(`Not looping song anymore`);
+                yield interaction.reply(`Not looping queue anymore`);
             }
         });
     }

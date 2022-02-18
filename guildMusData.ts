@@ -20,7 +20,6 @@ export async function guildSkip(interaction: CommandInteraction, data: GuildMusD
         return await interaction.reply(str);
     } else {
         str = 'Finished playing';
-
         if (interaction.replied) return await interaction.channel?.send(str);
         return await interaction.reply(str);
     }
@@ -66,11 +65,13 @@ export class GuildMusData {
     audioPlayer: AudioPlayer;
     songs: string[];
     loop: boolean;
+    loopQueue: boolean;
 
     constructor(player: AudioPlayer, link?: string) {
         this.audioPlayer = player;
         this.songs = [];
         this.loop = false;
+        this.loopQueue = false;
         if (link) this.songs.push(link);
     }
 
@@ -129,7 +130,11 @@ export class GuildMusData {
     }
 
     skip(data: GuildMusDataArr, guildId: string, connection: VoiceConnection): boolean {
+        if(this.loopQueue){
+            this.songs.push(this.songs.shift() as string);
+        } else {
         this.songs.shift();
+        }
         if (this.songs.length > 0) {
             this.playSong();
             return true;

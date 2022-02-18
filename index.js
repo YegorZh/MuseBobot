@@ -31,7 +31,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const discord_js_1 = require("discord.js");
 const guildMusData_1 = require("./guildMusData");
-// const { token } = require('./botconfig.json');
+if (process.env.NODE_ENV !== 'production')
+    require('dotenv').config();
 const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES] });
 let commands = new discord_js_1.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('js'));
