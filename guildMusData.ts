@@ -31,7 +31,10 @@ export async function checkLink(link: string, interaction: CommandInteraction){
     else if (link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1
     ) {
         let output = await yts(link, {limit: 1, pages: 1});
-        if(!output.items[0].url) return interaction.reply({content: 'No results for given phrase. Try another one or use a link.', ephemeral: true});
+        if(!output.items[0] || output.items[0].type !== 'video') {
+            await interaction.reply({content: 'No results for given phrase. Try another one or use a valid link.', ephemeral: true});
+            return null;
+        }
         return output.items[0].url;
     } else return link;
 }

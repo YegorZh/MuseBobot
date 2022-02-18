@@ -21,7 +21,8 @@ module.exports = {
         const {guildId, voiceChannel: channel} = check;
 
         let link = interaction.options.getString('link') as string;
-        link = await checkLink(link, interaction) as string;
+        link = await checkLink(link, interaction);
+        if(!link) return;
 
         const connection: VoiceConnection = joinVoiceChannel({
             channelId: channel.id,

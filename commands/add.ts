@@ -13,7 +13,8 @@ module.exports = {
         const {guildId} = check;
 
         let link = interaction.options.getString('link') as string;
-        link = await checkLink(link, interaction) as string;
+        link = await checkLink(link, interaction);
+        if(!link) return;
 
         data[guildId].songs.push(link);
         await interaction.reply(`Song ${link} was added to playlist`);

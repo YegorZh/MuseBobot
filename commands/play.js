@@ -24,7 +24,9 @@ module.exports = {
                 return;
             const { guildId, voiceChannel: channel } = check;
             let link = interaction.options.getString('link');
-            link = (yield (0, guildMusData_1.checkLink)(link, interaction));
+            link = yield (0, guildMusData_1.checkLink)(link, interaction);
+            if (!link)
+                return;
             const connection = (0, voice_1.joinVoiceChannel)({
                 channelId: channel.id,
                 guildId: guildId,

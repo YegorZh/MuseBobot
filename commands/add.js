@@ -23,7 +23,9 @@ module.exports = {
                 return;
             const { guildId } = check;
             let link = interaction.options.getString('link');
-            link = (yield (0, guildMusData_1.checkLink)(link, interaction));
+            link = yield (0, guildMusData_1.checkLink)(link, interaction);
+            if (!link)
+                return;
             data[guildId].songs.push(link);
             yield interaction.reply(`Song ${link} was added to playlist`);
         });

@@ -40,8 +40,10 @@ function checkLink(link, interaction) {
             return interaction.reply({ content: 'You must enter a youtube video link or search phrase.', ephemeral: true });
         else if (link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1) {
             let output = yield yts(link, { limit: 1, pages: 1 });
-            if (!output.items[0].url)
-                return interaction.reply({ content: 'No results for given phrase. Try another one or use a link.', ephemeral: true });
+            if (!output.items[0] || output.items[0].type !== 'video') {
+                yield interaction.reply({ content: 'No results for given phrase. Try another one or use a link.', ephemeral: true });
+                return null;
+            }
             return output.items[0].url;
         }
         else
