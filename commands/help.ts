@@ -12,9 +12,10 @@ module.exports = {
             'Add - adds song to the playlist.\n'+
             'Skip - skips current song.\n' +
             'Loop - loops or stops looping current song.\n' +
+            'LoopQueue - loops entire playlist\n.' +
             'Pause - pauses playing.\n' +
             'Resume - resumes playing.\n' +
-            'Stop - makes bot to completely stop playing and exit the voice channel.'
+            'Stop - makes bot completely stop playing and exit the voice channel.'
         await interaction.reply({content: str, ephemeral: true});
     }
 }

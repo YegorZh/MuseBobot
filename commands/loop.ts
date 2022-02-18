@@ -16,9 +16,9 @@ module.exports = {
 
         data[guildId].loop = !data[guildId].loop;
         if(data[guildId].loop){
-            await interaction.reply(`Now looping`);
+            await interaction.reply(`Now looping song`);
         } else {
-            await interaction.reply(`Not looping anymore`);
+            await interaction.reply(`Not looping song anymore`);
         }
     }
 }

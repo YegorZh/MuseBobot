@@ -23,10 +23,10 @@ module.exports = {
             const { guildId } = check;
             data[guildId].loop = !data[guildId].loop;
             if (data[guildId].loop) {
-                yield interaction.reply(`Now looping`);
+                yield interaction.reply(`Now looping song`);
             }
             else {
-                yield interaction.reply(`Not looping anymore`);
+                yield interaction.reply(`Not looping song anymore`);
             }
         });
     }
