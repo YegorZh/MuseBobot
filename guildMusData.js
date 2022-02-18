@@ -14,6 +14,7 @@ const voice_1 = require("@discordjs/voice");
 const youtubedl = require('youtube-dl-exec');
 const discord_js_1 = require("discord.js");
 const track_1 = require("./track");
+const ytpl = require('ytpl');
 const yts = require('ytsr');
 function guildSkip(interaction, data, guildId, connection) {
     var _a, _b;
@@ -38,10 +39,18 @@ function checkLink(link, interaction) {
     return __awaiter(this, void 0, void 0, function* () {
         if (typeof link !== "string")
             return interaction.reply({ content: 'You must enter a youtube video link or search phrase.', ephemeral: true });
+        else if (link.search(new RegExp('^((?:https?:)?\\/\\/)?((?:www|m)\\.)?((?:youtube?\\.com|youtu.be))(\\/(?:[\\w\\-]+\\?v=|embed\\/|v\\/)?)(playlist)(\\S+)?$')) !== -1) {
+            let output = yield ytpl(link);
+            let out = [];
+            for (let item of output.items) {
+                out.push(item.shortUrl);
+            }
+            return out;
+        }
         else if (link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1) {
             let output = yield yts(link, { limit: 1, pages: 1 });
             if (!output.items[0] || output.items[0].type !== 'video') {
-                yield interaction.reply({ content: 'No results for given phrase. Try another one or use a link.', ephemeral: true });
+                yield interaction.reply({ content: 'No results for given phrase. Try another one or use a valid link.', ephemeral: true });
                 return null;
             }
             return output.items[0].url;

@@ -38,12 +38,22 @@ module.exports = {
             }
             let player = data[guildId].audioPlayer;
             connection.subscribe(player);
-            data[guildId].songs[0] = link;
+            if (typeof link === 'string') {
+                data[guildId].songs[0] = link;
+            }
+            else {
+                data[guildId].songs[0] = link[0];
+                for (let i = 1; i < link.length; i++) {
+                    data[guildId].songs.push(link[i]);
+                }
+            }
             if (player.state.status === voice_1.AudioPlayerStatus.Paused) {
                 player.unpause();
             }
             data[guildId].playSong();
-            yield interaction.reply(`Playing ${link}`);
+            if (typeof link === 'string')
+                yield interaction.reply(`Playing ${link}`);
+            yield interaction.reply(`Playlist ${interaction.options.getString('link')}` + ` added\n. Playing ${link[0]}`);
         });
     }
 };

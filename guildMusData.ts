@@ -11,6 +11,7 @@ import {CommandInteraction, GuildChannel, GuildMember} from "discord.js";
 import ytdl from 'ytdl-core';
 import {Track} from "./track";
 import * as stream from "stream";
+const ytpl = require('ytpl');
 const yts = require('ytsr');
 
 export async function guildSkip(interaction: CommandInteraction, data: GuildMusDataArr, guildId: string, connection: VoiceConnection) {
@@ -28,6 +29,14 @@ export async function guildSkip(interaction: CommandInteraction, data: GuildMusD
 
 export async function checkLink(link: string, interaction: CommandInteraction){
     if (typeof link !== "string") return interaction.reply({content: 'You must enter a youtube video link or search phrase.', ephemeral: true});
+    else if(link.search(new RegExp('^((?:https?:)?\\/\\/)?((?:www|m)\\.)?((?:youtube?\\.com|youtu.be))(\\/(?:[\\w\\-]+\\?v=|embed\\/|v\\/)?)(playlist)(\\S+)?$')) !== -1){
+        let output = await ytpl(link);
+        let out: string[] = [];
+        for(let item of output.items){
+            out.push(item.shortUrl);
+        }
+        return out;
+    }
     else if (link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1
     ) {
         let output = await yts(link, {limit: 1, pages: 1});

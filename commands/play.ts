@@ -20,7 +20,7 @@ module.exports = {
         if (!check) return;
         const {guildId, voiceChannel: channel} = check;
 
-        let link = interaction.options.getString('link') as string;
+        let link: string | string[] = interaction.options.getString('link') as string;
         link = await checkLink(link, interaction);
         if(!link) return;
 
@@ -37,13 +37,24 @@ module.exports = {
 
         let player = data[guildId].audioPlayer;
         connection.subscribe(player);
-        data[guildId].songs[0] = link;
+
+        if(typeof link === 'string') {
+            data[guildId].songs[0] = link;
+        }
+        else {
+            data[guildId].songs[0] = link[0];
+            for(let i = 1; i < link.length; i++){
+                data[guildId].songs.push(link[i]);
+            }
+        }
+
 
         if (player.state.status === AudioPlayerStatus.Paused) {
             player.unpause();
         }
 
         data[guildId].playSong();
-        await interaction.reply(`Playing ${link}`);
+        if(typeof link === 'string') await interaction.reply(`Playing ${link}`);
+        await interaction.reply(`Playlist ${interaction.options.getString('link')}` + ` added.\n Playing ${link[0]}`)
     }
 }
