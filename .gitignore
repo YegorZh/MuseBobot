@@ -78,5 +78,6 @@ logs.txt
 test.ts
 test.js
 botconfig.json
+.env
 temp/
 node_modules/

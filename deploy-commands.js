@@ -22,7 +22,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const rest_1 = require("@discordjs/rest");
 const v9_1 = require("discord-api-types/v9");
-const { clientId, guildId, token } = require('./botconfig.json');
+require('dotenv').config();
+const token = process.env.TOKEN;
+const clientId = process.env.CLIENTID;
+const guildId = process.env.GUILDID;
 ;
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -31,6 +34,6 @@ for (const file of commandFiles) {
     commands.push(command.data.toJSON());
 }
 const rest = new rest_1.REST({ version: '9' }).setToken(token);
-rest.put(v9_1.Routes.applicationGuildCommands(clientId, guildId), { body: commands })
+rest.put(v9_1.Routes.applicationCommands(clientId), { body: commands })
     .then(() => console.log('Successfully registered application commands.'))
     .catch(console.error);
