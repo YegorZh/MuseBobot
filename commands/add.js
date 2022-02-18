@@ -23,9 +23,18 @@ module.exports = {
                 return;
             const { guildId } = check;
             let link = interaction.options.getString('link');
-            link = (yield (0, guildMusData_1.checkLink)(link, interaction));
-            data[guildId].songs.push(link);
-            yield interaction.reply(`Song ${link} was added to playlist`);
+            link = yield (0, guildMusData_1.checkLink)(link, interaction);
+            if (!link)
+                return;
+            if (typeof link === 'string') {
+                data[guildId].songs.push(link);
+                return yield interaction.reply(`Song ${link} was added to playlist`);
+            }
+            else {
+                for (let url of link)
+                    data[guildId].songs.push(url);
+                return yield interaction.reply(`Playlist ${interaction.options.getString('link')} was added to the end of the queue.`);
+            }
         });
     }
 };
