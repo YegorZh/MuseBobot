@@ -23,6 +23,8 @@ const fs = __importStar(require("fs"));
 const rest_1 = require("@discordjs/rest");
 const v9_1 = require("discord-api-types/v9");
 require('dotenv').config();
+const prodToken = process.env.PRODTOKEN;
+const prodID = process.env.PRODID;
 const token = process.env.TOKEN;
 const clientId = process.env.CLIENTID;
 const guildId = process.env.GUILDID;

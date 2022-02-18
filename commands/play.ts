@@ -7,22 +7,21 @@ import {
     joinVoiceChannel,
     VoiceConnection
 } from "@discordjs/voice";
-import {defaultErrorCheck, GuildMusData, GuildMusDataArr} from "../guildMusData";
+import {defaultErrorCheck, GuildMusData, GuildMusDataArr, checkLink} from "../guildMusData";
 
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('play')
         .setDescription('Plays first found youtube video by keyword or link.')
-        .addStringOption(option => option.setName('link').setDescription('Link duh').setRequired(true)),
+        .addStringOption(option => option.setName('link').setDescription('Link or search phrase').setRequired(true)),
     async execute(interaction: CommandInteraction, data: GuildMusDataArr) {
         const check = defaultErrorCheck(interaction, data, true);
         if (!check) return;
         const {guildId, voiceChannel: channel} = check;
 
-        const link = interaction.options.getString('link');
-        if (typeof link !== "string" || link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1
-        ) return interaction.reply({content: 'You must enter a youtube video link.', ephemeral: true});
+        let link = interaction.options.getString('link') as string;
+        link = await checkLink(link, interaction) as string;
 
         const connection: VoiceConnection = joinVoiceChannel({
             channelId: channel.id,

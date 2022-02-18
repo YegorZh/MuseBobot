@@ -11,6 +11,7 @@ import {CommandInteraction, GuildChannel, GuildMember} from "discord.js";
 import ytdl from 'ytdl-core';
 import {Track} from "./track";
 import * as stream from "stream";
+const yts = require('ytsr');
 
 export async function guildSkip(interaction: CommandInteraction, data: GuildMusDataArr, guildId: string, connection: VoiceConnection) {
     let str: string;
@@ -23,6 +24,16 @@ export async function guildSkip(interaction: CommandInteraction, data: GuildMusD
         if (interaction.replied) return await interaction.channel?.send(str);
         return await interaction.reply(str);
     }
+}
+
+export async function checkLink(link: string, interaction: CommandInteraction){
+    if (typeof link !== "string") return interaction.reply({content: 'You must enter a youtube video link or search phrase.', ephemeral: true});
+    else if (link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1
+    ) {
+        let output = await yts(link, {limit: 1, pages: 1});
+        if(!output.items[0].url) return interaction.reply({content: 'No results for given phrase. Try another one or use a link.', ephemeral: true});
+        return output.items[0].url;
+    } else return link;
 }
 
 export function defaultErrorCheck(interaction: CommandInteraction, data: GuildMusDataArr, short: boolean = false) {
@@ -93,7 +104,6 @@ export class GuildMusData {
             });
         });
         });
-
         // ytdl.getInfo(this.songs[0]).then((info) => {
         //     const resource: AudioResource = createAudioResource(ytdl.downloadFromInfo(info, {highWaterMark: 1<<25, quality: 'highestaudio', filter: 'audioonly', requestOptions:
         //             {maxReconnects: 24,
