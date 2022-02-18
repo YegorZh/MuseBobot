@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GuildMusData = exports.guildsMusDataArr = exports.defaultErrorCheck = exports.guildSkip = void 0;
+exports.GuildMusData = exports.guildsMusDataArr = exports.defaultErrorCheck = exports.checkLink = exports.guildSkip = void 0;
 const voice_1 = require("@discordjs/voice");
 const youtubedl = require('youtube-dl-exec');
 const discord_js_1 = require("discord.js");
 const track_1 = require("./track");
+const yts = require('ytsr');
 function guildSkip(interaction, data, guildId, connection) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
@@ -33,6 +34,21 @@ function guildSkip(interaction, data, guildId, connection) {
     });
 }
 exports.guildSkip = guildSkip;
+function checkLink(link, interaction) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (typeof link !== "string")
+            return interaction.reply({ content: 'You must enter a youtube video link or search phrase.', ephemeral: true });
+        else if (link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1) {
+            let output = yield yts(link, { limit: 1, pages: 1 });
+            if (!output.items[0].url)
+                return interaction.reply({ content: 'No results for given phrase. Try another one or use a link.', ephemeral: true });
+            return output.items[0].url;
+        }
+        else
+            return link;
+    });
+}
+exports.checkLink = checkLink;
 function defaultErrorCheck(interaction, data, short = false) {
     var _a, _b, _c, _d, _e;
     function reply(str) {
@@ -124,7 +140,7 @@ class GuildMusData {
     }
     skip(data, guildId, connection) {
         if (this.loopQueue) {
-            this.songs[this.songs.length - 1] = this.songs.shift();
+            this.songs.push(this.songs.shift());
         }
         else {
             this.songs.shift();

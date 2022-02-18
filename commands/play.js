@@ -16,16 +16,15 @@ module.exports = {
     data: new builders_1.SlashCommandBuilder()
         .setName('play')
         .setDescription('Plays first found youtube video by keyword or link.')
-        .addStringOption(option => option.setName('link').setDescription('Link duh').setRequired(true)),
+        .addStringOption(option => option.setName('link').setDescription('Link or search phrase').setRequired(true)),
     execute(interaction, data) {
         return __awaiter(this, void 0, void 0, function* () {
             const check = (0, guildMusData_1.defaultErrorCheck)(interaction, data, true);
             if (!check)
                 return;
             const { guildId, voiceChannel: channel } = check;
-            const link = interaction.options.getString('link');
-            if (typeof link !== "string" || link.search(new RegExp('http(?:s?):\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-\\_]*)(&(amp;)?‌​[\\w\\?‌​=]*)?')) === -1)
-                return interaction.reply({ content: 'You must enter a youtube video link.', ephemeral: true });
+            let link = interaction.options.getString('link');
+            link = (yield (0, guildMusData_1.checkLink)(link, interaction));
             const connection = (0, voice_1.joinVoiceChannel)({
                 channelId: channel.id,
                 guildId: guildId,

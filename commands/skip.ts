@@ -13,7 +13,6 @@ module.exports = {
         const check = defaultErrorCheck(interaction, data);
         if(!check || !check.connection) return;
         const {guildId, connection} = check;
-
         await guildSkip(interaction, data, guildId, connection);
     }
 }
