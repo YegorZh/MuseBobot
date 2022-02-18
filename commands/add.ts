@@ -9,14 +9,21 @@ module.exports = {
         .addStringOption(option => option.setName('link').setDescription('Link or search phrase').setRequired(true)),
     async execute(interaction: CommandInteraction, data: GuildMusDataArr) {
         const check = defaultErrorCheck(interaction, data);
-        if(!check) return;
+        if (!check) return;
         const {guildId} = check;
 
-        let link = interaction.options.getString('link') as string;
+        let link: string | string[] = interaction.options.getString('link') as string;
         link = await checkLink(link, interaction);
-        if(!link) return;
+        if (!link) return;
 
-        data[guildId].songs.push(link);
-        await interaction.reply(`Song ${link} was added to playlist`);
+        if (typeof link === 'string') {
+            data[guildId].songs.push(link);
+            return await interaction.reply(`Song ${link} was added to playlist`);
+        } else {
+            for(let url of link) data[guildId].songs.push(url);
+            return await interaction.reply(`Playlist ${interaction.options.getString('link')} was added to the end of the queue.`);
+        }
+
+
     }
 }

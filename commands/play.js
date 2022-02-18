@@ -52,8 +52,8 @@ module.exports = {
             }
             data[guildId].playSong();
             if (typeof link === 'string')
-                yield interaction.reply(`Playing ${link}`);
-            yield interaction.reply(`Playlist ${interaction.options.getString('link')}` + ` added\n. Playing ${link[0]}`);
+                return yield interaction.reply(`Playing ${link}`);
+            return yield interaction.reply(`Playlist ${interaction.options.getString('link')}` + ` added.\nPlaying ${link[0]}`);
         });
     }
 };

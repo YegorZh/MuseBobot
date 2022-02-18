@@ -54,7 +54,7 @@ module.exports = {
         }
 
         data[guildId].playSong();
-        if(typeof link === 'string') await interaction.reply(`Playing ${link}`);
-        await interaction.reply(`Playlist ${interaction.options.getString('link')}` + ` added.\n Playing ${link[0]}`)
+        if(typeof link === 'string') return await interaction.reply(`Playing ${link}`);
+        return await interaction.reply(`Playlist ${interaction.options.getString('link')}` + ` added.\nPlaying ${link[0]}`)
     }
 }
