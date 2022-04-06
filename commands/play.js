@@ -50,10 +50,11 @@ module.exports = {
             if (player.state.status === voice_1.AudioPlayerStatus.Paused) {
                 player.unpause();
             }
-            data[guildId].playSong();
+            let reply = `Playlist ${interaction.options.getString('link')}` + ` added.\nPlaying ${link[0]}`;
             if (typeof link === 'string')
-                return yield interaction.reply(`Playing ${link}`);
-            return yield interaction.reply(`Playlist ${interaction.options.getString('link')}` + ` added.\nPlaying ${link[0]}`);
+                reply = `Playing ${link}`;
+            data[guildId].playSong(interaction).catch(err => (0, guildMusData_1.guildSkip)(interaction, data, guildId, connection));
+            return yield interaction.reply(reply);
         });
     }
 };

@@ -20,7 +20,7 @@ function guildSkip(interaction, data, guildId, connection) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         let str;
-        if (data[guildId].skip(data, guildId, connection)) {
+        if (data[guildId].skip(data, guildId, connection, interaction)) {
             str = `Playing ${data[guildId].songs[0]}`;
             if (interaction.replied)
                 return yield ((_a = interaction.channel) === null || _a === void 0 ? void 0 : _a.send(str));
@@ -105,51 +105,58 @@ class GuildMusData {
             console.error('Error:', error.message);
         });
         data[guildId].audioPlayer.on(voice_1.AudioPlayerStatus.Idle, () => {
-            this.loop ? this.playSong() :
+            this.loop ? this.playSong(interaction) :
                 guildSkip(interaction, data, guildId, connection);
         });
     }
-    playSong() {
-        track_1.Track.from(this.songs[0]).then(stream => {
-            stream.createAudioResource().then(resource => {
+    playSong(interaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((res, rej) => track_1.Track.from(this.songs[0])
+                .then(stream => stream.createAudioResource())
+                .then(resource => {
                 resource.playStream.on('readable', () => __awaiter(this, void 0, void 0, function* () {
                     this.audioPlayer.play(resource);
                 }));
-            });
+            })
+                .catch(err => {
+                var _a;
+                (_a = interaction.channel) === null || _a === void 0 ? void 0 : _a.send('Error while trying to play this song.');
+                rej(err);
+            }));
+            // ytdl.getInfo(this.songs[0]).then((info) => {
+            //     const resource: AudioResource = createAudioResource(ytdl.downloadFromInfo(info, {highWaterMark: 1<<25, quality: 'highestaudio', filter: 'audioonly', requestOptions:
+            //             {maxReconnects: 24,
+            //             maxRetries: 12,
+            //             backoff: { inc: 500, max: 10000 }}}), {
+            //         inputType: StreamType.WebmOpus
+            //     });
+            //     resource.playStream.on('readable', async () => {
+            //         this.audioPlayer.play(resource);
+            //     });
+            // });
+            // youtubedl(this.songs[0], {f: '249', dumpJson: true}).then((output: any) => {
+            //         const req = https.get(output.url,  (response) => {
+            //             if (response.statusCode === 200) {
+            //                 const resource: AudioResource = createAudioResource(response, {
+            //                     inputType: StreamType.WebmOpus
+            //                 });
+            //                 resource.playStream.on('readable', async () => {
+            //                     this.audioPlayer.play(resource);
+            //                 });
+            //             }
+            //         })
+            //         req.on('error', function (e) {
+            //             console.log(e);
+            //         });
+            //         req.on('timeout', function () {
+            //             console.log('timeout');
+            //             req.destroy();
+            //         });
+            //     }
+            // );
         });
-        // ytdl.getInfo(this.songs[0]).then((info) => {
-        //     const resource: AudioResource = createAudioResource(ytdl.downloadFromInfo(info, {highWaterMark: 1<<25, quality: 'highestaudio', filter: 'audioonly', requestOptions:
-        //             {maxReconnects: 24,
-        //             maxRetries: 12,
-        //             backoff: { inc: 500, max: 10000 }}}), {
-        //         inputType: StreamType.WebmOpus
-        //     });
-        //     resource.playStream.on('readable', async () => {
-        //         this.audioPlayer.play(resource);
-        //     });
-        // });
-        // youtubedl(this.songs[0], {f: '249', dumpJson: true}).then((output: any) => {
-        //         const req = https.get(output.url,  (response) => {
-        //             if (response.statusCode === 200) {
-        //                 const resource: AudioResource = createAudioResource(response, {
-        //                     inputType: StreamType.WebmOpus
-        //                 });
-        //                 resource.playStream.on('readable', async () => {
-        //                     this.audioPlayer.play(resource);
-        //                 });
-        //             }
-        //         })
-        //         req.on('error', function (e) {
-        //             console.log(e);
-        //         });
-        //         req.on('timeout', function () {
-        //             console.log('timeout');
-        //             req.destroy();
-        //         });
-        //     }
-        // );
     }
-    skip(data, guildId, connection) {
+    skip(data, guildId, connection, interaction) {
         if (this.loopQueue) {
             this.songs.push(this.songs.shift());
         }
@@ -157,7 +164,7 @@ class GuildMusData {
             this.songs.shift();
         }
         if (this.songs.length > 0) {
-            this.playSong();
+            this.playSong(interaction).catch(err => guildSkip(interaction, data, guildId, connection));
             return true;
         }
         else {

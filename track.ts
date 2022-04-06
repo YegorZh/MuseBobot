@@ -48,6 +48,7 @@ export class Track implements TrackData {
      */
     public createAudioResource(): Promise<AudioResource<Track>> {
         return new Promise((resolve, reject) => {
+
             const process = ytdl(
                 this.url,
                 {
@@ -62,12 +63,12 @@ export class Track implements TrackData {
                 reject(new Error('No stdout'));
                 return;
             }
-            const stream = process.stdout;
             const onError = (error: Error) => {
                 if (!process.killed) process.kill();
                 stream.resume();
                 reject(error);
             };
+            const stream = process.stdout;
             process
                 .once('spawn', () => {
                     demuxProbe(stream)

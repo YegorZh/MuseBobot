@@ -1,5 +1,5 @@
-import {SlashCommandBuilder} from '@discordjs/builders'
-import {CommandInteraction, GuildChannel, GuildMember} from "discord.js";
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { CommandInteraction, GuildChannel, GuildMember } from "discord.js";
 import {
     AudioPlayerStatus,
     createAudioPlayer,
@@ -7,7 +7,7 @@ import {
     joinVoiceChannel,
     VoiceConnection
 } from "@discordjs/voice";
-import {defaultErrorCheck, GuildMusData, GuildMusDataArr, checkLink} from "../guildMusData";
+import { defaultErrorCheck, GuildMusData, GuildMusDataArr, checkLink, guildSkip } from "../guildMusData";
 
 
 module.exports = {
@@ -18,11 +18,11 @@ module.exports = {
     async execute(interaction: CommandInteraction, data: GuildMusDataArr) {
         const check = defaultErrorCheck(interaction, data, true);
         if (!check) return;
-        const {guildId, voiceChannel: channel} = check;
+        const { guildId, voiceChannel: channel } = check;
 
         let link: string | string[] = interaction.options.getString('link') as string;
         link = await checkLink(link, interaction);
-        if(!link) return;
+        if (!link) return;
 
         const connection: VoiceConnection = joinVoiceChannel({
             channelId: channel.id,
@@ -38,12 +38,12 @@ module.exports = {
         let player = data[guildId].audioPlayer;
         connection.subscribe(player);
 
-        if(typeof link === 'string') {
+        if (typeof link === 'string') {
             data[guildId].songs[0] = link;
         }
         else {
             data[guildId].songs[0] = link[0];
-            for(let i = 1; i < link.length; i++){
+            for (let i = 1; i < link.length; i++) {
                 data[guildId].songs.push(link[i]);
             }
         }
@@ -53,8 +53,10 @@ module.exports = {
             player.unpause();
         }
 
-        data[guildId].playSong();
-        if(typeof link === 'string') return await interaction.reply(`Playing ${link}`);
-        return await interaction.reply(`Playlist ${interaction.options.getString('link')}` + ` added.\nPlaying ${link[0]}`)
+        let reply = `Playlist ${interaction.options.getString('link')}` + ` added.\nPlaying ${link[0]}`;
+        if (typeof link === 'string') reply = `Playing ${link}`;
+        
+        data[guildId].playSong(interaction).catch(err => guildSkip(interaction, data, guildId, connection));
+        return await interaction.reply(reply);
     }
 }

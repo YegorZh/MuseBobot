@@ -49,13 +49,13 @@ class Track {
                 reject(new Error('No stdout'));
                 return;
             }
-            const stream = process.stdout;
             const onError = (error) => {
                 if (!process.killed)
                     process.kill();
                 stream.resume();
                 reject(error);
             };
+            const stream = process.stdout;
             process
                 .once('spawn', () => {
                 (0, voice_1.demuxProbe)(stream)
